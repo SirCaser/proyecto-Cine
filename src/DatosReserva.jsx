@@ -15,7 +15,6 @@ function DatosReserva() {
             <p className='text-[#9b9792] '>Fecha: <span className='text-white'>{fecha}</span></p><br />
             <p className='text-[#9b9792] '>Total: <span className='text-white'>{total}</span></p><br />
         </div>
-
     </body>
   );
 }
