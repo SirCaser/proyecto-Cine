@@ -17,6 +17,10 @@ import { loader as Loader } from './FilmDetails.jsx';
 import FilmBuy from './FilmBuy.jsx';
 import { loader as Loader2 } from './FilmBuy.jsx';
 import DatosReserva from './DatosReserva.jsx';
+import FavoritesPage from './FavoritesPage.jsx';
+import Reservas from './Reservas.jsx';
+import store from './store/store.js'
+import { Provider } from 'react-redux'
 
 /**
  * La función AppLayout devuelve un componente de diseño con un componente Outlet y un componente
@@ -43,7 +47,15 @@ const router = createBrowserRouter([
     {
       path: "/cartelera",
       element: <Cartelera />,
-    },,
+    },
+    {
+      path: "/FavoritesPage",
+      element: <FavoritesPage />,
+    },
+    {
+      path: "/Reservas",
+      element: <Reservas />,
+    },
     {
       path: "/datosReserva",
       element: <DatosReserva />,
@@ -66,6 +78,8 @@ const router = createBrowserRouter([
 raíz de la aplicación. */
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
+    <Provider store={store}>
     <RouterProvider router={router} />
+    </Provider>
   </React.StrictMode>,
 )

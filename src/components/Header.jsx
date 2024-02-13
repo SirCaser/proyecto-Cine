@@ -31,8 +31,10 @@ const Header = () => {
         <img src="./media/logocine.png" alt="Logo" className="h-12 w-auto" />
         <h1 className="text-2xl font-bold">Nexo Films</h1>
         <nav className="flex space-x-4">
-          <Link to="/" className="hover:text-[#071429]">Inicio</Link>
+          <Link to="/" className="hover:text-[#071429]"><p>Inicio</p></Link>
           <Link to="/cartelera" className="hover:text-[#071429]">Cartelera</Link>
+          <Link to="/FavoritesPage" className="hover:text-[#071429]">Favoritos</Link>
+          <Link to="/Reservas" className="hover:text-[#071429]">Reservas</Link>
         </nav>
       </div>
     </header>

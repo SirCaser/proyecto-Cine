@@ -3,6 +3,8 @@ import {useLoaderData } from "react-router-dom";
 import Button from './components/Button.jsx';
 import ButtonFav from './components/ButtonFav.jsx';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getFilmsID } from './store/slices/filmsThunks.js';
 
 
 export async function loader({ params }) {
@@ -12,7 +14,8 @@ export async function loader({ params }) {
 
 function FilmDetails() {
   const { id } = useLoaderData();
-  const [detallesPelicula, setDetallesPelicula] = useState(null);
+  const dispatch = useDispatch();
+  const {films} = useSelector( state => state.films)
 
   function convertirDuracion(duracionEnMinutos) {
     const horas = Math.floor(duracionEnMinutos / 60);
@@ -39,75 +42,54 @@ function FilmDetails() {
   
 
   const obtenerTrailer = (videos) => {
-    const trailer = videos.find(video => video.type === 'Trailer' && video.site === 'YouTube');
-    return `${trailer.key}`;
+    const trailer = videos?.find(video => video.type === 'Trailer' && video.site === 'YouTube');
+    return `${trailer?.key}`;
   };
 
   useEffect(() => {
-    const obtenerDetallesPelicula = async () => {
-      try {
-        const apiKey = '850e2704d34d71b7a396eaadd700ed03';
-        const url = `https://api.themoviedb.org/3/movie/${id}?api_key=${apiKey}&language=es-ES&append_to_response=credits,videos`;
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data) {
-          setDetallesPelicula({
-            titulo: data.title,
-            fechaEstreno: formatearFechaCompleta(data.release_date),
-            descripcion: data.overview,
-            imagen: `https://image.tmdb.org/t/p/w500${data.poster_path}`,
-            valoracion: data.vote_average.toFixed(1),
-            generos: data.genres.map(genre => genre.name).join(', '),
-            actores: data.credits.cast.slice(0, 5).map(actor => actor.name).join(', '),
-            duracion: convertirDuracion(data.runtime),
-            trailer: obtenerTrailer(data.videos.results),
-          });
-        } else {
-          console.error('No se encontraron detalles para la película con ID:', id);
-        }
-      } catch (error) {
-        console.error('Error al obtener detalles de la película:', error);
-      }
-    };
-
-    obtenerDetallesPelicula();
+    dispatch(getFilmsID(id));
   }, [id]);
+    const titulo = films?.title
+    const fechaEstreno = formatearFechaCompleta(films?.release_date)
+    const descripcion = films?.overview
+    const imagen = `https://image.tmdb.org/t/p/w500${films?.poster_path}`
+    const valoracion = films?.vote_average?.toFixed(1)
+    const generos = films?.genres?.map(genre => genre.name).join(', ')
+    const actores = films?.credits?.cast.slice(0, 5).map(actor => actor.name).join(', ')
+    const duracion = convertirDuracion(films?.runtime)
+    const trailer = obtenerTrailer(films?.videos?.results)
 
-  if (!detallesPelicula) {
-    return <p>Cargando detalles de la película...</p>;
-  }
 
   return (
     <body className='bg-[#071429] font-poppins'><br />
-      <h2 className="text-4xl font-bold text-center text-white mt-20 mb-10 m-5">{detallesPelicula.titulo}</h2>
+      <h2 className="text-4xl font-bold text-center text-white mt-20 mb-10 m-5">{titulo}</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 m-5 ml-20">
         <div className="col-span-1">
           <div className="flex justify-center">
             <Link to={`/FilmBuy/${id}`} key={id} className="  rounded-xl shadow-md text-white">
               <Button />
             </Link>
-            <ButtonFav texto={detallesPelicula.titulo}/>
+            <ButtonFav texto={titulo} img={imagen} id={id}/>
           </div>
-          <img className='rounded w-82' src={detallesPelicula.imagen} alt={`Imagen de ${detallesPelicula.titulo}`} />
+          <img className='rounded w-82' src={imagen} alt={`Imagen de ${titulo}`} />
         </div>
         <div className="col-span-2 flex flex-col justify-center">
           <div><br /><br /><br />
             <p className='text-[#9b9792] text-left'>FECHA DE ESTRENO</p>
-            <p className='text-white text-left mb-10'>{detallesPelicula.fechaEstreno} </p>
+            <p className='text-white text-left mb-10'>{fechaEstreno} </p>
             <p className='text-[#9b9792] text-left'>DURACION</p>
-            <p className='text-white text-left mb-10'>{detallesPelicula.duracion}</p>
+            <p className='text-white text-left mb-10'>{duracion}</p>
             <p className='text-[#9b9792] text-left'>VALORACIÓN</p>
-            <p className='text-white text-left mb-10'>{detallesPelicula.valoracion}</p>
+            <p className='text-white text-left mb-10'>{valoracion}</p>
             <p className='text-[#9b9792] text-left'>GÉNEROS</p>
-            <p className='text-white text-left mb-10'>{detallesPelicula.generos}</p>
+            <p className='text-white text-left mb-10'>{generos}</p>
             <p className='text-[#9b9792] text-left'>ACTORES</p>
-            <p className='text-white text-left mb-10'>{detallesPelicula.actores}</p>
+            <p className='text-white text-left mb-10'>{actores}</p>
             <p className='text-[#9b9792] text-left'>SINOPSIS</p>
-            <p className='text-white text-left mb-10'>{detallesPelicula.descripcion}</p>
+            <p className='text-white text-left mb-10'>{descripcion}</p>
           </div>
           <div className='flex justify-center mb-16'>
-            {detallesPelicula.trailer && (
+            {trailer && (
               <div>
                 <p className='text-[#9b9792] text-left mb-2'>TRÁILER</p>
                 <div className="iframe-container">
@@ -115,7 +97,7 @@ function FilmDetails() {
                     title="Tráiler"
                     width="700"
                     height="455"
-                    src={`https://www.youtube.com/embed/${detallesPelicula.trailer}`}
+                    src={`https://www.youtube.com/embed/${trailer}`}
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen

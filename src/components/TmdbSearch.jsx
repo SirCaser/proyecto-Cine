@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { getFilms } from '../store/slices/filmsThunks.js';
 
 const TmdbSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [movies, setMovies] = useState([]);
+  const dispatch = useDispatch();
+  const { films } = useSelector(state => state.films);
 
   const handleSearch = async () => {
-    try {
-      const apiKey = '850e2704d34d71b7a396eaadd700ed03'; // Reemplaza con tu propia clave de API de TMDb
-      const response = await axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${searchQuery}`);
-      setMovies(response.data.results);
-    } catch (error) {
-      console.error('Error al buscar películas en la API de TMDb:', error);
-    }
+    dispatch(getFilms(searchQuery));
   };
 
   return (
@@ -32,12 +28,12 @@ const TmdbSearch = () => {
         </button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 m-5 mb-16">
-        {movies.map(movie => (
-          <Link to={`/FilmDetails/${movie.id}`} key={movie.id} className="bg-black  rounded-xl shadow-md text-white">
-            <h2 className="text-lg font-semibold mb-2 text-center p-4">{movie.title}</h2>
+        {films?.map(film => (
+          <Link to={`/FilmDetails/${film?.id}`} key={film?.id} className="bg-black  rounded-xl shadow-md text-white">
+            <h2 className="text-lg font-semibold mb-2 text-center p-4">{film?.title}</h2>
             <img
-                src={`https://image.tmdb.org/t/p/w300${movie.poster_path}`}
-                alt={`${movie.title} Poster`}
+                src={`https://image.tmdb.org/t/p/w300${film?.poster_path}`}
+                alt={`${film?.title} Poster`}
                 className="w-full h-[32rem] object-cover rounded-b-xl rounded-t-none"
               />
           </Link>

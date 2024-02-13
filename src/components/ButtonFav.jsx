@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
 import Modal from './Modal.jsx';
 
-const ButtonFav = ({ texto, funcion }) => {
+const ButtonFav = ({ texto, img, id }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleButtonClick = () => {
-    setIsModalOpen(true);
+    const favorites = JSON.parse(localStorage.getItem('favoritos')) || [];
+
+    // Comprobar si la película ya está en favoritos
+    const exists = favorites.some(movie => movie.id === id);
+
+    if (!exists) {
+      // Si la película no está en favoritos, agregarla al array
+      const updatedFavorites = [...favorites, { id, texto, img }];
+      // Guardar el array actualizado en localStorage
+      localStorage.setItem('favoritos', JSON.stringify(updatedFavorites));
+      setIsModalOpen(true);
+    }
   };
 
   const closeModal = () => {

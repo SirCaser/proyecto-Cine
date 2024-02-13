@@ -3,27 +3,16 @@ import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getFilms } from '../store/slices/filmsThunks.js';
 
 const ImageCarousel = () => {
-  const [movies, setMovies] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const dispatch = useDispatch();
+  const {films} = useSelector( state => state.films)
 
   useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const apiKey = '850e2704d34d71b7a396eaadd700ed03'; // Reemplaza con tu clave de API de TMDb
-        const response = await fetch(`https://api.themoviedb.org/3/movie/now_playing?api_key=${apiKey}&language=en-US&page=1`);
-        const data = await response.json();
-
-        if (data.results) {
-          setMovies(data.results.slice(0, 15));
-        }
-      } catch (error) {
-        console.error('Error al obtener películas:', error);
-      }
-    };
-
-    fetchMovies();
+    dispatch(getFilms());
   }, []);
 
   const settings = {
@@ -57,7 +46,7 @@ const ImageCarousel = () => {
   return (
     <div className="max-w-screen-lg mx-auto mt-2">
       <Slider {...settings}>
-        {movies.map((movie, index) => (
+        {films?.map((film, index) => (
          
           <div key={index} className="mx-2">
             <div
@@ -66,9 +55,9 @@ const ImageCarousel = () => {
                 transform: currentIndex !== index ? 'scale(0.9)' : 'scale(1)',
                 opacity: currentIndex !== index ? 0.7 : 1,
               }}
-            ><Link to={`/FilmDetails/${movie.id}`} key={movie.id} className="bg-black  rounded-xl shadow-md text-white">
+            ><Link to={`/FilmDetails/${film.id}`} key={film.id} className="bg-black  rounded-xl shadow-md text-white">
               <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                src={`https://image.tmdb.org/t/p/w500${film.poster_path}`}
                 alt={`Slide ${index + 1}`}
                 className="w-full h-[30rem] object-cover rounded-lg shadow-md"
               />
